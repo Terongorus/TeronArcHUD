@@ -3,7 +3,7 @@
 ## Notes: Combat HUD showing player/target/pet health, mana/rage/energy and casting as rings centered on your screen. Settings are a proper options window instead of a right-click menu off the minimap button.
 ## Author: Uruloke (Saleel/Nenie), GitHub re-upload by McPewPew, Teron fork by Terongorus
 ## SavedVariables: ArcHUDDB
-## Version: 1.1.4
+## Version: 1.1.5
 ## OptionalDeps: Ace2, FuBar, FuBarPlugin-2.0, CompostLib, DewDropLib, MetrognomeLib, TabletLib
 ## X-Embeds: Ace2, FuBarPlugin-2.0, CompostLib, DewDropLib, MetrognomeLib, TabletLib
 

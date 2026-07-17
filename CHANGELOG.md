@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions follow major.minor.hotfix (e.g. 1.2.3).
 
+## [1.1.5] - 2026-07-17
+
+### Fixed
+- `Interface\AddOns\TeronArcHUD\Options.lua:123: attempt to call method 'SetChecked' (a
+  nil value)`: the checkbox and slider handlers read the global `this` again *after*
+  calling `fireClick`/`fireSlider`, which invoke `ArcHUD.modDB` - for a non-namespaced key
+  that cascades through `OnProfileDisable`/`OnProfileEnable`, touching many other frames.
+  If any of that synchronously triggers another widget's script, the engine reassigns the
+  shared `this` global for that nested call and never restores it afterward, so the later
+  read was not reliably still the widget that was actually clicked/dragged. Both handlers
+  now capture `this` into a local at the very start, before any side-effecting call.
+- The main frame title ("Teron's ArcHUD") and the selected category's title ("Display
+  options", etc.) were only 4px apart vertically and visibly overlapped. Moved the category
+  title down and pushed the category/content panels down to match, trading a little bit of
+  panel height for a clear header area.
+
 ## [1.1.4] - 2026-07-17
 
 ### Fixed

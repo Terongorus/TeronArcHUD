@@ -112,15 +112,25 @@ local function acquireCheckbox(index)
 		btn:SetScript("OnEnter", showTooltip)
 		btn:SetScript("OnLeave", hideTooltip)
 		btn:SetScript("OnClick", function()
-			local data = this.entryData
+			-- Capture this/its fields into locals before fireClick, not after: it calls
+			-- into ArcHUD.modDB, which for a non-namespaced key cascades through
+			-- OnProfileDisable/OnProfileEnable touching many other frames, and if any of
+			-- that synchronously triggers another widget's script, the engine reassigns
+			-- the shared global `this` for that nested call - it does not get restored
+			-- afterward, so reading `this` again below could silently be a *different*
+			-- widget than the one actually clicked (this is how the reported
+			-- "attempt to call method 'SetChecked' (a nil value)" happened: this had
+			-- become some other frame with no SetChecked method by the time it was read).
+			local clicked = this
+			local data = clicked.entryData
 			if not data then
 				return
 			end
 			fireClick(data)
-			if this.isRadio then
-				Options:RefreshRadioGroup(this.radioSubKey)
+			if clicked.isRadio then
+				Options:RefreshRadioGroup(clicked.radioSubKey)
 			else
-				this:SetChecked(toggleChecked(data) and 1 or nil)
+				clicked:SetChecked(toggleChecked(data) and 1 or nil)
 			end
 		end)
 		checkPool[index] = btn
@@ -164,13 +174,20 @@ local function acquireSlider(index)
 			if this.suppressCallback then
 				return
 			end
-			local data = this.entryData
+			-- Capture this into a local before fireSlider, same reason as the checkbox
+			-- OnClick handler: it can cascade through ArcHUD.modDB into
+			-- OnProfileDisable/OnProfileEnable, and if that synchronously triggers another
+			-- widget's script, the shared global `this` gets reassigned for that nested
+			-- call and stays that way - reading `this` again afterward is not reliably
+			-- still this slider.
+			local changed = this
+			local data = changed.entryData
 			if not data then
 				return
 			end
-			local value = this:GetValue()
+			local value = changed:GetValue()
 			fireSlider(data, value)
-			this.titleText:SetText(formatSliderValue(this, value))
+			changed.titleText:SetText(formatSliderValue(changed, value))
 		end)
 		sliderPool[index] = slider
 	end
@@ -241,7 +258,7 @@ function Options:BuildCategories()
 			end
 		end
 	end
-	ArcHUDOptionsFrameCategoryScrollFrameScrollChild:SetHeight(math.max(390, math.abs(y) + 10))
+	ArcHUDOptionsFrameCategoryScrollFrameScrollChild:SetHeight(math.max(370, math.abs(y) + 10))
 
 	if index > 0 then
 		local first = categoryButtons[1]
@@ -383,7 +400,7 @@ function Options:SelectCategory(key, label)
 	end
 
 	layoutEntries(list, 0)
-	ArcHUDOptionsFrameContentScrollFrameScrollChild:SetHeight(math.max(366, math.abs(y) + 10))
+	ArcHUDOptionsFrameContentScrollFrameScrollChild:SetHeight(math.max(346, math.abs(y) + 10))
 end
 
 function Options:Show()

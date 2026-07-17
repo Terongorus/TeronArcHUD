@@ -30,7 +30,7 @@
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
 							<Offset>
-								<AbsDimension x="212" y="-20"/>
+								<AbsDimension x="212" y="-40"/>
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -58,19 +58,19 @@
 			     frame is sized wider than the buttons inside it to leave that clear. -->
 			<ScrollFrame name="$parentCategoryScrollFrame" inherits="UIPanelScrollFrameTemplate">
 				<Size>
-					<AbsDimension x="170" y="390"/>
+					<AbsDimension x="170" y="370"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPLEFT">
 						<Offset>
-							<AbsDimension x="14" y="-38"/>
+							<AbsDimension x="14" y="-58"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
 				<ScrollChild>
 					<Frame name="$parentScrollChild">
 						<Size>
-							<AbsDimension x="170" y="390"/>
+							<AbsDimension x="170" y="370"/>
 						</Size>
 						<Anchors>
 							<Anchor point="TOPLEFT"/>
@@ -82,7 +82,7 @@
 			<!-- Divider between the category list and the selected category's options -->
 			<Frame name="$parentDivider">
 				<Size>
-					<AbsDimension x="1" y="390"/>
+					<AbsDimension x="1" y="370"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parentCategoryScrollFrame" relativePoint="TOPRIGHT">
@@ -106,7 +106,7 @@
 			     landing on top of the border itself before this was widened further. -->
 			<ScrollFrame name="$parentContentScrollFrame" inherits="UIPanelScrollFrameTemplate">
 				<Size>
-					<AbsDimension x="360" y="366"/>
+					<AbsDimension x="360" y="346"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parentCategoryScrollFrame" relativePoint="TOPRIGHT">
@@ -118,7 +118,7 @@
 				<ScrollChild>
 					<Frame name="$parentScrollChild">
 						<Size>
-							<AbsDimension x="360" y="366"/>
+							<AbsDimension x="360" y="346"/>
 						</Size>
 						<Anchors>
 							<Anchor point="TOPLEFT"/>
