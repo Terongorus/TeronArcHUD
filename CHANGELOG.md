@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions follow major.minor.hotfix (e.g. 1.2.3).
 
+## [1.1.4] - 2026-07-17
+
+### Fixed
+- **The actual data-corruption bug** (1.1.1's fix addressed a symptom, not the cause):
+  `SetMinMaxValues`/`SetValueStep`/`SetValue` can synchronously re-fire `OnValueChanged` on
+  a pooled slider while re-clamping its *leftover* value from whatever it was last used
+  for - even with the correct entry attached (fixed in 1.1.1), that spurious fire still
+  wrote the leftover, now-clamped number into the profile, and `SelectCategory` would then
+  read that just-corrupted value straight back as "the current value" - looking exactly
+  like the change instantly reverted on every category switch. `OnValueChanged` now checks
+  a `suppressCallback` flag that's set for a slider's entire programmatic setup block and
+  only cleared after the real value is applied, so only a genuine user drag (which happens
+  with the guard already off) can ever write to the profile.
+
 ## [1.1.3] - 2026-07-17
 
 ### Fixed

@@ -152,6 +152,18 @@ local function acquireSlider(index)
 		slider:SetScript("OnValueChanged", function()
 			-- Never call this:SetValue() from in here - it re-fires OnValueChanged (unlike
 			-- CheckButton:SetChecked(), which doesn't re-fire OnClick) and would loop.
+			--
+			-- suppressCallback guards against a worse problem than stale entryData: even
+			-- with the correct entry attached, SetMinMaxValues/SetValueStep can themselves
+			-- re-clamp this pooled slider's leftover value from whatever it was last used
+			-- for and fire this handler *before* SelectCategory gets a chance to call
+			-- SetValue with the real value - writing that leftover, now-clamped number into
+			-- the profile. SelectCategory sets this true for its entire setup block and
+			-- only clears it after the real SetValue call, so only genuine user drags (which
+			-- happen with the guard already off) ever reach fireSlider.
+			if this.suppressCallback then
+				return
+			end
 			local data = this.entryData
 			if not data then
 				return
@@ -292,11 +304,15 @@ function Options:SelectCategory(key, label)
 					elseif data.hasSlider then
 						sliderIndex = sliderIndex + 1
 						local slider = acquireSlider(sliderIndex)
-						-- Assign every field OnValueChanged might read BEFORE calling any
-						-- Slider setter below - SetMinMaxValues/SetValue can re-clamp the
-						-- widget's leftover value from whatever this pooled slider was used
-						-- for last and synchronously re-fire OnValueChanged, and that handler
-						-- must never see a previous entry's stale data.
+						-- suppressCallback blocks OnValueChanged for this entire setup block -
+						-- SetMinMaxValues/SetValueStep/SetValue can all re-clamp this pooled
+						-- slider's leftover value (from whatever it was last used for) and
+						-- synchronously re-fire the handler before the real value below is
+						-- ever set, which would otherwise write that leftover clamped number
+						-- into this entry's profile key. Only cleared after SetValue has set
+						-- the real value, so a genuine user drag is the only thing that can
+						-- still reach fireSlider.
+						slider.suppressCallback = true
 						slider.tooltipTitle = data.tooltipTitle
 						slider.tooltipText = data.tooltipText
 						slider.entryData = data
@@ -313,6 +329,7 @@ function Options:SelectCategory(key, label)
 						slider:SetPoint("TOPLEFT", ArcHUDOptionsFrameContentScrollFrameScrollChild, "TOPLEFT", 6 + indent, y)
 						local current = currentSliderValue(data)
 						slider:SetValue(current)
+						slider.suppressCallback = false
 						slider.titleText:SetText(formatSliderValue(slider, current))
 						slider:Show()
 						y = y - SLIDER_HEIGHT
