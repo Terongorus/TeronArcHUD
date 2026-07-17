@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions follow major.minor.hotfix (e.g. 1.2.3).
 
+## [1.1.3] - 2026-07-17
+
+### Fixed
+- The content panel's own scrollbar (right side, `UIPanelScrollFrameTemplate`) landed on
+  top of the dialog's ~12px border texture - 1.1.1's widening only left room for the
+  scrollbar itself, not the scrollbar *plus* the border past it. Narrowed the content
+  scrollframe further to clear both.
+
 ## [1.1.2] - 2026-07-17
 
 ### Fixed
