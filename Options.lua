@@ -17,9 +17,11 @@ local SLIDER_HEIGHT = 44
 local GAP_HEIGHT = 10
 local CATEGORY_BUTTON_HEIGHT = 24
 -- A slider's own title text (set via the "...Text" sub-widget) sits above its anchor
--- point rather than below it, so the first row in a panel needs extra headroom or that
--- title clips against the scrollframe's/frame's own top edge.
+-- point rather than below it, so it needs extra headroom before its own TOPLEFT anchor -
+-- both for the very first row in a panel (against the scrollframe's top edge) and for any
+-- slider that directly follows a checkbox/label row (against that row's own text).
 local CONTENT_START_Y = -20
+local SLIDER_TOP_PADDING = 14
 
 local categoriesBuilt = false
 local categoryButtons = {}
@@ -306,6 +308,7 @@ function Options:SelectCategory(key, label)
 						slider:SetValueStep(data.sliderStep or 1)
 						getglobal(slider:GetName() .. "Low"):SetText(data.sliderMinText or tostring(minV))
 						getglobal(slider:GetName() .. "High"):SetText(data.sliderMaxText or tostring(maxV))
+						y = y - SLIDER_TOP_PADDING
 						slider:ClearAllPoints()
 						slider:SetPoint("TOPLEFT", ArcHUDOptionsFrameContentScrollFrameScrollChild, "TOPLEFT", 6 + indent, y)
 						local current = currentSliderValue(data)

@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions follow major.minor.hotfix (e.g. 1.2.3).
 
+## [1.1.2] - 2026-07-17
+
+### Fixed
+- 1.1.1's top-headroom fix only applied to the *first* control in a panel. A slider
+  directly following a checkbox (e.g. Display options' "Nameplate hover delay" after
+  "Nameplate hover message") still had its title text overlapping the checkbox row above
+  it, since every slider's title sits above its own anchor point, not just the first one.
+  The padding now applies before every slider, wherever it falls in the panel.
+
 ## [1.1.1] - 2026-07-17
 
 ### Fixed
