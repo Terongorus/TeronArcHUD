@@ -3,7 +3,7 @@
 
 	<Frame name="ArcHUDOptionsFrame" parent="UIParent" toplevel="true" hidden="true" frameStrata="DIALOG" enableMouse="true" movable="true">
 		<Size>
-			<AbsDimension x="560" y="460"/>
+			<AbsDimension x="620" y="480"/>
 		</Size>
 		<Anchors>
 			<Anchor point="CENTER"/>
@@ -30,7 +30,7 @@
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
 							<Offset>
-								<AbsDimension x="178" y="-40"/>
+								<AbsDimension x="212" y="-20"/>
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -53,10 +53,12 @@
 				</Scripts>
 			</Button>
 
-			<!-- Left column: one button per settings category -->
+			<!-- Left column: one button per settings category. UIPanelScrollFrameTemplate's
+			     scrollbar sits ~20-25px outside the scrollframe's own right edge, so the
+			     frame is sized wider than the buttons inside it to leave that clear. -->
 			<ScrollFrame name="$parentCategoryScrollFrame" inherits="UIPanelScrollFrameTemplate">
 				<Size>
-					<AbsDimension x="150" y="390"/>
+					<AbsDimension x="170" y="390"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPLEFT">
@@ -68,7 +70,7 @@
 				<ScrollChild>
 					<Frame name="$parentScrollChild">
 						<Size>
-							<AbsDimension x="150" y="390"/>
+							<AbsDimension x="170" y="390"/>
 						</Size>
 						<Anchors>
 							<Anchor point="TOPLEFT"/>
@@ -85,7 +87,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parentCategoryScrollFrame" relativePoint="TOPRIGHT">
 						<Offset>
-							<AbsDimension x="8" y="0"/>
+							<AbsDimension x="10" y="0"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -98,22 +100,24 @@
 				</Layers>
 			</Frame>
 
-			<!-- Right column: the selected category's options -->
+			<!-- Right column: the selected category's options. Same scrollbar-clearance
+			     reasoning as the category list - the frame is wider than the controls
+			     inside it (see CONTENT_WIDTH in Options.lua). -->
 			<ScrollFrame name="$parentContentScrollFrame" inherits="UIPanelScrollFrameTemplate">
 				<Size>
-					<AbsDimension x="345" y="366"/>
+					<AbsDimension x="380" y="366"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parentCategoryScrollFrame" relativePoint="TOPRIGHT">
 						<Offset>
-							<AbsDimension x="20" y="-22"/>
+							<AbsDimension x="28" y="-22"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
 				<ScrollChild>
 					<Frame name="$parentScrollChild">
 						<Size>
-							<AbsDimension x="345" y="366"/>
+							<AbsDimension x="380" y="366"/>
 						</Size>
 						<Anchors>
 							<Anchor point="TOPLEFT"/>

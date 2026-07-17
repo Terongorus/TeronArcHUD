@@ -13,9 +13,13 @@ ArcHUD.Options = {}
 local Options = ArcHUD.Options
 
 local CHECK_HEIGHT = 22
-local SLIDER_HEIGHT = 46
+local SLIDER_HEIGHT = 44
 local GAP_HEIGHT = 10
 local CATEGORY_BUTTON_HEIGHT = 24
+-- A slider's own title text (set via the "...Text" sub-widget) sits above its anchor
+-- point rather than below it, so the first row in a panel needs extra headroom or that
+-- title clips against the scrollframe's/frame's own top edge.
+local CONTENT_START_Y = -20
 
 local categoriesBuilt = false
 local categoryButtons = {}
@@ -122,6 +126,15 @@ local function acquireCheckbox(index)
 	return btn
 end
 
+-- The label text is combined with the current value ("Fade when full: 10%") into the
+-- slider's own title sub-widget, rather than a separate FontString below the slider -
+-- OptionsSliderTemplate's Low/High labels already sit right at the slider's bottom edge,
+-- so a second text anchored below the slider collided with them.
+local function formatSliderValue(slider, value)
+	local formatted = slider.isPercent and (math.floor(value * 100 + 0.5) .. "%") or tostring(value)
+	return (slider.labelPrefix or "") .. ": " .. formatted
+end
+
 local function acquireSlider(index)
 	local slider = sliderPool[index]
 	if not slider then
@@ -130,10 +143,8 @@ local function acquireSlider(index)
 		slider:SetWidth(280)
 		slider:SetHeight(16)
 		slider:SetOrientation("HORIZONTAL")
-		getglobal(name .. "Text"):SetFontObject(GameFontHighlight)
-		local valueText = slider:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-		valueText:SetPoint("TOP", slider, "BOTTOM", 0, -2)
-		slider.valueText = valueText
+		slider.titleText = getglobal(name .. "Text")
+		slider.titleText:SetFontObject(GameFontHighlight)
 		slider:SetScript("OnEnter", showTooltip)
 		slider:SetScript("OnLeave", hideTooltip)
 		slider:SetScript("OnValueChanged", function()
@@ -145,7 +156,7 @@ local function acquireSlider(index)
 			end
 			local value = this:GetValue()
 			fireSlider(data, value)
-			this.valueText:SetText(this.isPercent and (math.floor(value * 100 + 0.5) .. "%") or tostring(value))
+			this.titleText:SetText(formatSliderValue(this, value))
 		end)
 		sliderPool[index] = slider
 	end
@@ -167,7 +178,7 @@ local function acquireCategoryButton(index)
 	local btn = categoryButtons[index]
 	if not btn then
 		btn = CreateFrame("Button", "ArcHUDOptionsCategory" .. index, ArcHUDOptionsFrameCategoryScrollFrameScrollChild, "UIPanelButtonTemplate")
-		btn:SetWidth(140)
+		btn:SetWidth(148)
 		btn:SetHeight(20)
 		btn:SetScript("OnClick", function()
 			Options:SelectCategory(this.categoryKey, this.categoryLabel)
@@ -264,7 +275,7 @@ function Options:SelectCategory(key, label)
 	end
 
 	local checkIndex, sliderIndex, labelIndex = 0, 0, 0
-	local y = -4
+	local y = CONTENT_START_Y
 
 	local function layoutEntries(entries, indent)
 		for _, entry in ipairs(entries) do
@@ -279,22 +290,27 @@ function Options:SelectCategory(key, label)
 					elseif data.hasSlider then
 						sliderIndex = sliderIndex + 1
 						local slider = acquireSlider(sliderIndex)
+						-- Assign every field OnValueChanged might read BEFORE calling any
+						-- Slider setter below - SetMinMaxValues/SetValue can re-clamp the
+						-- widget's leftover value from whatever this pooled slider was used
+						-- for last and synchronously re-fire OnValueChanged, and that handler
+						-- must never see a previous entry's stale data.
+						slider.tooltipTitle = data.tooltipTitle
+						slider.tooltipText = data.tooltipText
+						slider.entryData = data
+						slider.isPercent = data.sliderIsPercent
+						slider.labelPrefix = data.text
 						local minV = data.sliderMin or 0
 						local maxV = data.sliderMax or (data.sliderIsPercent and 1 or 100)
 						slider:SetMinMaxValues(minV, maxV)
 						slider:SetValueStep(data.sliderStep or 1)
 						getglobal(slider:GetName() .. "Low"):SetText(data.sliderMinText or tostring(minV))
 						getglobal(slider:GetName() .. "High"):SetText(data.sliderMaxText or tostring(maxV))
-						getglobal(slider:GetName() .. "Text"):SetText(data.text or "")
-						slider.tooltipTitle = data.tooltipTitle
-						slider.tooltipText = data.tooltipText
-						slider.entryData = data
-						slider.isPercent = data.sliderIsPercent
 						slider:ClearAllPoints()
 						slider:SetPoint("TOPLEFT", ArcHUDOptionsFrameContentScrollFrameScrollChild, "TOPLEFT", 6 + indent, y)
 						local current = currentSliderValue(data)
 						slider:SetValue(current)
-						slider.valueText:SetText(slider.isPercent and (math.floor(current * 100 + 0.5) .. "%") or tostring(current))
+						slider.titleText:SetText(formatSliderValue(slider, current))
 						slider:Show()
 						y = y - SLIDER_HEIGHT
 					elseif data.hasArrow and data.value then
