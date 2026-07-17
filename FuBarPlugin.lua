@@ -5,8 +5,6 @@
 -- Only load if ArcHUD is already loaded
 if not ArcHUD then return end
 
-local dewdrop = AceLibrary("Dewdrop-2.0")
-
 ArcHUDFu = AceLibrary("AceAddon-2.0"):new("AceDB-2.0", "FuBarPlugin-2.0")
 ArcHUDFu:RegisterDB("ArcHUDDB")
 ArcHUDFu.hasIcon = "Interface\\Icons\\Ability_Hunter_Pathfinding"
@@ -14,9 +12,18 @@ ArcHUDFu.cannotDetachTooltip = true
 ArcHUDFu.independentProfile = true
 ArcHUDFu.hideWithoutStandby = true
 
-function ArcHUDFu:OnMenuRequest(level, value, x, valueN_1, valueN_2, valueN_3, valueN_4)
-	ArcHUD.createDDMenu(level, value, true)
-	if(level == 1) then
-		dewdrop:AddLine()
-	end
+-- These used to open the old right-click Dewdrop menu (ArcHUD.createDDMenu, still intact
+-- in Core.lua and read directly by Options.lua) - both FuBar-bar mode (OnMenuRequest) and
+-- minimap-icon mode (OnClick for left-click, OpenMenu for right-click) now open the
+-- options frame instead.
+function ArcHUDFu:OnMenuRequest()
+	ArcHUD.Options:Toggle()
+end
+
+function ArcHUDFu:OnClick()
+	ArcHUD.Options:Toggle()
+end
+
+function ArcHUDFu:OpenMenu()
+	ArcHUD.Options:Toggle()
 end

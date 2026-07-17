@@ -15,8 +15,10 @@ local d_info = 2
 local d_notice = 3
 
 -- Set up Dewdrop and core addon options menu
+-- (dewdrop_menu/createDDMenu below still build the full options tree - Options.lua reads
+-- it directly to drive the options frame; only the entry points that used to open it via
+-- Dewdrop's own popup were changed, further down in this file and in FuBarPlugin.lua)
 local dewdrop = AceLibrary:GetInstance("Dewdrop-2.0")
-local ddframe
 
 -- Set up database
 ArcHUD:RegisterDB("ArcHUDDB")
@@ -69,17 +71,7 @@ ArcHUD:RegisterChatCommand({"/archud", "/ah"}, {
 			name		= "config",
 			desc		= L"CMD_OPTS_FRAME",
 			func		= function()
-				if not ddframe then
-					ddframe = CreateFrame("Frame", nil, UIParent)
-					ddframe:SetWidth(2)
-					ddframe:SetHeight(2)
-					ddframe:SetPoint("BOTTOMLEFT", GetCursorPosition())
-					ddframe:SetClampedToScreen(true)
-					dewdrop:Register(ddframe, 'dontHook', true, 'children', ArcHUD.createDDMenu)
-				end
-				local x,y = GetCursorPosition()
-				ddframe:SetPoint("BOTTOMLEFT", x / UIParent:GetScale(), y / UIParent:GetScale())
-				dewdrop:Open(ddframe)
+				ArcHUD.Options:Toggle()
 			end,
 		},
 		debug = {
